@@ -139,7 +139,13 @@ function cleanAndParseJson_(raw) {
   try {
     return JSON.parse(str);
   } catch (e) {
-    return null;
+    // LLM sometimes returns JS object literals with unquoted keys — fix them
+    try {
+      const fixed = str.replace(/([{,]\s*)(\w+)\s*:/g, '$1"$2":');
+      return JSON.parse(fixed);
+    } catch (e2) {
+      return null;
+    }
   }
 }
 
